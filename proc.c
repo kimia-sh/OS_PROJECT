@@ -6,7 +6,6 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
-
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -61,6 +60,10 @@ myproc(void) {
   pushcli();
   c = mycpu();
   p = c->proc;
+  // int i;
+  // for(i=0;i<25;i++){
+  //   (p->c)[i]=0;
+  // }
   popcli();
   return p;
 }
@@ -532,3 +535,49 @@ procdump(void)
     cprintf("\n");
   }
 }
+void concat(char p[], char q[]) {
+   int c, d;
+   
+   c = 0;
+ 
+   while (p[c] != '\0') {
+      c++;      
+   }
+ 
+   d = 0;
+ 
+   while (q[d] != '\0') {
+      p[c] = q[d];
+      d++;
+      c++;    
+   }
+ 
+   p[c] = '\0';
+}
+
+int getParentID(void){
+       struct proc *curproc = myproc();
+       struct proc *parent =curproc->parent;
+       int parentID=parent->pid;
+       return parentID;
+}
+ int getChildren(char ** result){
+      struct proc *p;
+      struct proc *curproc = myproc();
+      int id=curproc->pid;
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    int parentID=(p->parent)->pid;
+    if(id==parentID){
+      int FoundID=p->pid;
+      char FoundChar=FoundID;
+      concat(*result,&FoundChar);
+      char tmp='/';
+      concat(*result,&tmp);
+    }
+  }
+  //printf(1,"in proc.c\n",result);
+  
+  return 0;
+}
+
